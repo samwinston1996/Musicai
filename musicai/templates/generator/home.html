@@ -1,0 +1,402 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}MusicAI - Free Text-to-Image Generator AI{% endblock title %}
+{% block style %}
+<style>
+body{
+    background-color: #140F0F;
+}
+.model_list{
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  scrollbar-color: #D9D9D9;
+  padding-bottom: 25px;
+}
+.model_list::-webkit-scrollbar {
+  height: 8px;
+}
+.model_list::-webkit-scrollbar-track {
+  background-color: #140F0F;
+}
+.model_list::-webkit-scrollbar-thumb {
+  background-color: #D9D9D9;
+  border-radius: 100px;
+}
+.model_btn{
+    background-color: #9A9898;
+    color: #090000;
+    font-size: 25px;
+    font-family: Stint Ultra Expanded;
+    margin: 0 10px;
+}
+.model_btn:hover{
+  background-color: #F2F2F2;
+  color: #272c3a;
+}
+.model_btn_active{
+  background-color: #F2F2F2;
+  color: #272c3a;
+}
+.prompt_field_positive{
+    background-color: #1C202C !important;
+}
+.prompt_field_negative{
+    background-color: #171A22 !important;
+}
+.prompt_field{
+    display: block;
+    color: #ffffff;
+    border: 0;
+    width: 100%;
+    resize: none;
+    padding: 10px;
+}
+.prompt_field:focus{
+  border: 1px solid #272c3a;
+  outline: none;
+}
+.input_label_bg{
+  background-color: #BCBCBC !important;
+}
+.input_field_bg{
+  background-color: #F2F2F2 !important;
+}
+.card_wrapper{
+  font-size: 12px;
+  height: 24px;
+  width: inherit;
+}
+.card_wrapper_input{
+  height: 100%;
+  font-size: 12px;
+  margin: 0;
+}
+.card_wrapper_sm{
+  font-size: 12px;
+  height: 24px;
+}
+.generate_btn{
+  background-color: #222C3F;
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-family: Stint Ultra Expanded;
+  letter-spacing: 1.76px;
+  width: 400px;
+}
+@media(max-width: 767px){
+  .generate_btn {
+    width: 80%;
+  }
+}
+.generate_btn:hover{
+  background-color: #F2F2F2;
+  color: #272c3a;
+}
+.generated_img_area{
+  background-color: #0F0B0B;
+  height: 500px;
+}
+.generated_img{
+  max-width: 100%;
+  max-height: 100%;
+}
+.output_log_field{
+  background-color: #1C202C;
+  color: #ffffff;
+  width: 100%;
+  border: 1px solid #272c3a;
+  resize: none;
+  padding: 10px;
+}
+.output_log_field:focus{
+  outline: none;
+}
+</style>
+{% endblock style %}
+{% block page_title %}Generator{% endblock page_title %}
+{% block content %}
+<div class="container-fluid">
+<div class="row mt-5">
+<div class="col-12 model_list mb-4">
+{% if models %}
+{% for model in models %}
+<button class="btn model_btn" onclick="model_id('{{ model.model_name }}', this)">{{ model.display_name }}</button>
+{% endfor %}
+{% endif %}
+<input type="hidden" id="model_checkpoint_field">
+</div>
+<div class="col-md-6 mb-5">
+<div class="row">
+  <div class="col-md-10 mx-auto mb-5">
+    <textarea class="prompt_field prompt_field_positive" rows="5" placeholder="Positive Prompt" required></textarea>
+    <textarea class="prompt_field prompt_field_negative" rows="5" placeholder="Negative Prompt (optional)"></textarea>
+  </div>
+  <div class="col-md-10 mx-auto mb-4">
+    <div class="card card-body d-flex justify-content-between flex-row align-items-center p-0 input_field_bg rounded-3">
+      <span class="px-3">Sampler</span>
+      <div class="w-50">
+        <select class="form-select text-center input_label_bg rounded-3 sampler_selector">
+          <option value="Euler" selected>Euler</option>
+          <option value="Euler a">Euler a</option>
+          <option value="LMS">LMS</option>
+          <option value="Heun">Heun</option>
+          <option value="DPM2">DPM2</option>
+          <option value="DPM2 a">DPM2 a</option>
+          <option value="DPM++ 2S a">DPM++ 2S a</option>
+          <option value="DPM++ 2M">DPM++ 2M</option>
+          <option value="DPM++ SDE">DPM++ SDE</option>
+          <option value="DPM fast">DPM fast</option>
+          <option value="DPM adaptive">DPM adaptive</option>
+          <option value="LMS Karras">LMS Karras</option>
+          <option value="DPM2 Karras">DPM2 Karras</option>
+          <option value="DPM2 a Karras">DPM2 a Karras</option>
+          <option value="DPM++ 2S a Karras">DPM++ 2S a Karras</option>
+          <option value="DPM++ 2M Karras">DPM++ 2M Karras</option>
+          <option value="DPM++ SDE Karras">DPM++ SDE Karras</option>
+          <option value="DDIM">DDIM</option>
+          <option value="PLMS">PLMS</option>
+        </select>
+      </div>
+    </div>
+  </div>
+<div class="col-md-10 d-flex mx-auto">
+    <div class="card d-flex justify-content-between flex-row input_label_bg mx-2 card_wrapper rounded-pill">
+        <span class="px-2">Seed</span>
+        <div class="w-50">
+            <input type="number" class="form-control input_field_bg p-0 text-center card_wrapper_input rounded-pill seed_field" value="-1" required>
+        </div>
+    </div>
+    <div class="card d-flex justify-content-between flex-row input_label_bg mx-2 card_wrapper rounded-pill">
+        <span class="px-2">Steps</span>
+        <div class="w-50">
+            <input type="number" class="form-control input_field_bg p-0 text-center card_wrapper_input rounded-pill steps_field" min="1" max="150" value="20" required>
+        </div>
+    </div>
+    <button class="input_label_bg p-0 d-flex justify-content-around align-items-center border-0 rounded-pill px-3 mx-2" style="font-size: 12px;">
+        <img src="{% static 'assets/random_seed_icon.png' %}" width="20px">
+    </button>
+    <button class="input_label_bg p-0 d-flex justify-content-around align-items-center border-0 rounded-pill px-3" style="font-size: 12px;">
+        <i class="fas fa-undo text-white"></i>
+    </button>
+</div>
+<div class="col-md-10 d-flex mx-auto my-5">
+  <div class="card d-flex justify-content-between flex-row input_label_bg mx-2 card_wrapper_sm rounded-pill">
+      <span class="px-2">Height</span>
+      <div class="w-50">
+          <input type="number" class="form-control input_field_bg p-0 text-center card_wrapper_input rounded-pill height_field" value="512" required style="height: 100%; font-size: 12px; margin: 0;">
+      </div>
+  </div>
+  <div class="card d-flex justify-content-between flex-row input_label_bg mx-2 card_wrapper_sm rounded-pill">
+      <span class="px-2">Width</span>
+      <div class="w-50">
+          <input type="number" class="form-control input_field_bg p-0 text-center card_wrapper_input rounded-pill width_field" value="512" required>
+      </div>
+  </div>
+</div>
+<div class="col-md-10 mx-auto mb-4">
+<div class="row">
+<div class="col-md-8">
+  <div class="card d-flex justify-content-between align-items-center flex-row input_label_bg mx-2 input_field_bg rounded-pill" style="font-size: 13px; height: 30px;">
+    <span class="px-2">CFG Scale</span>
+    <div class="w-50">
+      <select class="form-select text-center input_label_bg rounded-pill cfg_scale_selector" style="font-size: 13px; height: 30px;">
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+        <option value="14">14</option>
+        <option value="15">15</option>
+        <option value="16">16</option>
+        <option value="17">17</option>
+        <option value="18">18</option>
+        <option value="19">19</option>
+        <option value="20">20</option>
+        <option value="21">21</option>
+        <option value="22">22</option>
+        <option value="23">23</option>
+        <option value="24">24</option>
+        <option value="25">25</option>
+        <option value="26">26</option>
+        <option value="27">27</option>
+        <option value="28">28</option>
+        <option value="29">29</option>
+        <option value="30">30</option>
+      </select>
+    </div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-12 text-center">
+  <button type="button" class="btn generate_btn">GENERATE</button>
+</div>
+</div>
+</div>
+<div class="col-md-6 mb-5">
+<div class="row">
+<div class="col-md-10 mx-auto">
+  <div class="generated_img_area d-flex justify-content-center align-items-center p-4">
+    <img src="" class="generated_img">
+  </div>
+  <textarea class="output_log_field my-3" rows="3" placeholder="OUTPUT Log" readonly></textarea>
+  <div>
+    <button class="btn btn-sm input_label_bg px-5 rounded-pill" id="download_btn">
+        <i class="fas fa-download text-white"></i>
+    </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button class="btn btn-sm input_label_bg px-5 rounded-pill dropdown-toggle" id="dropdown_btn" data-bs-toggle="dropdown">
+      <i class="fas fa-upload text-white"></i>
+    </button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item publish-gallery" href="#"><i class="fas fa-images text-success"></i> Publish to Gallery</a>
+      <hr class="m-0">
+      <a class="dropdown-item share_to_insta_btn" target="_blank">
+        <i class="fab fa-instagram text-danger"></i> Share to Instagram
+      </a>
+      <hr class="m-0">
+      <a class="dropdown-item share_to_twitter_btn" target="_blank">
+        <i class="fab fa-twitter text-info"></i> Share to Twitter
+      </a>      
+    </div>
+    <input type="hidden" id="download_btn_url">
+  </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endblock content %}
+{% block script %}
+<script>
+function model_id(data, button){
+  $(".model_btn").removeClass("model_btn_active");
+  $("#model_checkpoint_field").val(data);
+  $(button).addClass("model_btn_active");
+};
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+$.ajaxSetup({
+  beforeSend: function(xhr, settings) {
+    if (!settings.crossDomain) {
+      const csrftoken = getCookie("csrftoken");
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    }
+  }
+});
+
+$(".generate_btn").click(function(event){
+  event.preventDefault();
+  let req_data = {
+    model_checkpoint: $("#model_checkpoint_field").val(),
+    prompt_ps: $(".prompt_field_positive").val(),
+    prompt_ng: $(".prompt_field_negative").val(),
+    sampler: $(".sampler_selector").val(),
+    seed: $(".seed_field").val(),
+    steps: $(".steps_field").val(),
+    height: $(".height_field").val(),
+    width: $(".width_field").val(),
+    cfg_scale: $(".cfg_scale_selector").val(),
+    csrfmiddlewaretoken: $("#csrf_token_field").val()
+  };
+
+  let intervalId;
+
+  setTimeout(() => {
+    $(".output_log_field").val("Task started, please wait until it finish...\n");
+  }, 1500);
+
+  // Function to add dots to the message
+  function addDots() {
+    let currentMessage = $(".output_log_field").val();
+    $(".output_log_field").val(currentMessage + ".");
+  }
+
+  setTimeout(() => {
+    $(".output_log_field").val($(".output_log_field").val() + "progress: ");
+  }, 3000);
+
+  setTimeout(() => {
+    intervalId = setInterval(addDots, 1000);
+  }, 4500);
+
+  $.ajax({
+    url: "{% url 'generator' %}",
+    type: "POST",
+    data: req_data,
+    success: function(response){
+      clearInterval(intervalId);
+      if(response.status === 200){
+        $(".generated_img").attr("src", response.data);
+        $(".output_log_field").val($(".output_log_field").val() + "\nTask completed successfully");
+        $("#download_btn_url").val(response.data);
+        $(".share_to_insta_btn").attr("href", `https://www.instagram.com/?utm_source=your_website&utm_medium=share_button&utm_campaign=instagram_share&url=${response.data}`);
+        $(".share_to_twitter_btn").attr("href", `https://twitter.com/share?url=${response.data}`);
+      }else{
+        $(".output_log_field").val($(".output_log_field").val() + "\nTask stopped! please try again later...");
+      }
+    }
+  });
+});
+
+const downloadBtn = document.getElementById("download_btn");
+downloadBtn.addEventListener("click", () => {
+  // Replace `image_url` with the actual URL of the image to be downloaded
+  const imageUrl = $("#download_btn_url").val();
+  // Create a temporary anchor element
+  const downloadLink = document.createElement("a");
+  // Set the href attribute to the image URL
+  downloadLink.href = imageUrl;
+  // Set the download attribute to specify the filename
+  downloadLink.download = "image.jpg";
+  // Trigger a click event on the anchor element to start the download
+  downloadLink.click();
+});
+
+$('.publish-gallery').click(function(e) {
+    e.preventDefault();
+    let imageUrl = $('#download_btn_url').val();
+
+    // Send AJAX request to save the image URL and file to the database and media directory
+    $.ajax({
+        url: "{% url 'save_to_gallery' %}",
+        type: "POST",
+        data: {
+            image_url: imageUrl
+        },
+        success: function(response) {
+          $(".output_log_field").val("Image published to gallery successfully");
+          setTimeout(() => {
+            window.location.href = "showcase";
+          }, 1500);
+        },
+        error: function() {
+          $(".output_log_field").val("Failed to publish image to gallery");
+        }
+    });
+});
+</script>
+{% endblock script %}
