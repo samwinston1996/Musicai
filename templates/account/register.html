@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+{% load static %}
+{% block title %}MusicAI - Create an Account{% endblock title %}
+{% block style %}
+<style>
+body{
+    position: relative;
+    height: 100vh;
+}
+body::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.719);
+    z-index: -1;
+}
+body{
+    background-color: #140F0F;
+}
+nav{
+    z-index: 1;
+}
+#login_area{
+    width: fit-content;
+    height: fit-content;
+}
+.card.card-body.rounded-4.py-5 {
+    background: #3e3e3e0d;
+}
+.btn-google{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  font-size: 16px;
+  background-color: #212529;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+}
+.btn-google img{
+  width: 25px;
+}
+.btn-google span{
+  flex-grow: 1;
+}
+.btn-google:hover{
+  background-color: #ffffff;
+  color: #212529;
+  border: 1px solid #212529;
+}
+.divider{
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+}
+.divider::before,
+.divider::after{
+  content: "";
+  flex-grow: 1;
+  border-top: 1px solid #ffffff;
+  margin: 0 10px;
+}
+</style>
+{% endblock style %}
+{% block content %}
+<div id="login_area"></div>
+<div class="container">
+<div class="row mt-5">
+<div class="col-md-5 mx-auto mt-5 pt-5">
+    <div class="card card-body rounded-4 py-5">
+        <h3 class="text-center text-white mb-0">Musicai.Art</h3>
+        <hr class="text-white mx-auto" width="25px">
+        {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+            {{ msg|safe }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% endif %}
+        <form action="{% url 'register' %}" method="POST">
+            {% csrf_token %}
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-user text-white border rounded-4 p-2 me-2"></i>
+              {{ form.username }}
+            </div>
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-envelope text-white border rounded-4 p-2 me-2"></i>
+              {{ form.email }}
+            </div>
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-lock  text-white border rounded-4 p-2 me-2"></i>
+              {{ form.password1 }}
+            </div>
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-lock  text-white border rounded-4 p-2 me-2"></i>
+              {{ form.password2 }}
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Sign up</button>
+            </div>
+        </form>
+        <div class="text-center text-white mt-3">Already have an account? <a href="{% url 'login' %}" class="text-info">Login here</a></div>
+        <div class="divider my-4">OR</div>
+        <div class="row">
+          <div class="col-md-8 mx-auto">
+              <a href="{% provider_login_url 'google' %}" class="btn btn-lg btn-google"><img src="{% static 'assets/google.png' %}"> <span>Continue with Google</span></a>
+          </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% endblock content %}
+{% block script %}
+<script src="{% static 'js/particles.js' %}"></script>
+<script>
+$(document).ready(function(){
+    $("input").addClass("form-control");
+    $("#id_username").attr("placeholder", "Username");
+    $("#id_email").attr("placeholder", "Email");
+    $("#id_password1").attr("placeholder", "Password");
+    $("#id_password2").attr("placeholder", "Confirm Password");
+});
+particlesJS('login_area',
+  {
+    "particles": {
+      "number": {
+        "value": 35,
+        "density": {
+          "enable": true,
+          "value_area": 800
+        }
+      },
+      "color": {
+        "value": "#ffffff"
+      },
+      "shape": {
+        "type": "circle",
+        "stroke": {
+          "width": 0,
+          "color": "#000000"
+        },
+        "polygon": {
+          "nb_sides": 5
+        },
+        "image": {
+          "src": "img/github.svg",
+          "width": 100,
+          "height": 100
+        }
+      },
+      "opacity": {
+        "value": 0.5,
+        "random": false,
+        "anim": {
+          "enable": false,
+          "speed": 1,
+          "opacity_min": 0.1,
+          "sync": false
+        }
+      },
+      "size": {
+        "value": 5,
+        "random": true,
+        "anim": {
+          "enable": false,
+          "speed": 40,
+          "size_min": 0.1,
+          "sync": false
+        }
+      },
+      "line_linked": {
+        "enable": true,
+        "distance": 150,
+        "color": "#ffffff",
+        "opacity": 0.4,
+        "width": 1
+      },
+      "move": {
+        "enable": true,
+        "speed": 6,
+        "direction": "none",
+        "random": false,
+        "straight": false,
+        "out_mode": "out",
+        "attract": {
+          "enable": false,
+          "rotateX": 600,
+          "rotateY": 1200
+        }
+      }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": {
+          "enable": true,
+          "mode": "repulse"
+        },
+        "onclick": {
+          "enable": true,
+          "mode": "push"
+        },
+        "resize": true
+      },
+      "modes": {
+        "grab": {
+          "distance": 400,
+          "line_linked": {
+            "opacity": 1
+          }
+        },
+        "bubble": {
+          "distance": 400,
+          "size": 40,
+          "duration": 2,
+          "opacity": 8,
+          "speed": 3
+        },
+        "repulse": {
+          "distance": 200
+        },
+        "push": {
+          "particles_nb": 4
+        },
+        "remove": {
+          "particles_nb": 2
+        }
+      }
+    },
+    "retina_detect": true,
+    "config_demo": {
+      "hide_card": false,
+      "background_color": "#b61924",
+      "background_image": "",
+      "background_position": "50% 50%",
+      "background_repeat": "no-repeat",
+      "background_size": "cover"
+    }
+  }
+
+);
+</script>
+{% endblock script %}

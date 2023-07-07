@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}MusicAI - Login to Continue{% endblock title %}
+{% block style %}
+<style>
+body{
+  background-color: #140F0F;
+}
+.grid {
+  column-count: 6;
+  column-gap: .5em;
+  width: 980px;
+  margin: auto;
+  width: 100%;
+}
+img {
+  height: auto;
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+@media(max-width: 800px){
+    .grid {
+      column-count: 3;
+  }
+}
+@media(max-width: 600px){
+    .grid {
+      column-count: 2;
+  }
+}
+@media(max-width: 400px){
+    .grid {
+      column-count: 1;
+  }
+}
+</style>
+{% endblock style %}
+{% block page_title %}SHOWCASE{% endblock page_title %}
+{% block content %}
+<div class="card card-body rounded-0 py-4 mb-5"></div>
+<div class="container-fluid pt-4">
+<div class="grid">
+{% if gallery %}
+{% for img in gallery %}
+<div class="grid__item">
+  <img src="{{ img.image.url }}">
+</div>
+{% endfor %}
+{% endif %}
+</div>
+</div>
+{% endblock content %}
