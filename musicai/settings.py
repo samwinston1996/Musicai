@@ -13,13 +13,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-rq@56+=zurqvo^x)9y3#isly65#7+8f+fdcbq&=hh%ybkb$4x+'
 
 # Enable debug mode
-DEBUG = False
+DEBUG = True
 
 # Allow all hosts to access the application
 ALLOWED_HOSTS = ["*"]
-
-# Set to True in production
-CSRF_COOKIE_SECURE = True
 
 # Set the root URL configuration for the project
 ROOT_URLCONF = 'musicai.urls'
