@@ -1,9 +1,9 @@
-Django==4.2.2
-django-allauth==0.54.0
-django-jazzmin==2.6.0
-gunicorn==20.1.0
+Django
+django-allauth
+django-jazzmin
+gunicorn
 mysqlclient
 Pillow
 python-dotenv
 requests
-whitenoise==6.2.0
+whitenoise
