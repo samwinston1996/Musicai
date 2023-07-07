@@ -17,6 +17,7 @@ DEBUG = True
 
 # Allow all hosts to access the application
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ["https://musicai-production.up.railway.app"]
 
 # Set the root URL configuration for the project
 ROOT_URLCONF = 'musicai.urls'
