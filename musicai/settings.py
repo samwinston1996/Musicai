@@ -16,7 +16,10 @@ SECRET_KEY = 'django-insecure-rq@56+=zurqvo^x)9y3#isly65#7+8f+fdcbq&=hh%ybkb$4x+
 DEBUG = False
 
 # Allow all hosts to access the application
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["localhost", "https://musicai-production.up.railway.app"]
+
+# Set to True in production
+CSRF_COOKIE_SECURE = True
 
 # Set the root URL configuration for the project
 ROOT_URLCONF = 'musicai.urls'
