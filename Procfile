@@ -1,1 +1,1 @@
-web: gunicorn musicai.wsgi:application --chdir=/app
+web: gunicorn musicai.wsgi:application

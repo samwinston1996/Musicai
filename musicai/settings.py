@@ -23,7 +23,7 @@ ROOT_URLCONF = 'musicai.urls'
 
 # Configure the installed apps for the Django project
 INSTALLED_APPS = [
-    'jazzmin',  # Optional: Install the Jazzmin admin theme
+    'jazzmin',  # Install the Jazzmin admin theme
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -186,3 +186,12 @@ JAZZMIN_SETTINGS = {
     "site_header": "Musicai.Art",
     "site_brand": "Musicai.Art",
 }
+
+
+# email configuration for sent forgot password email to users
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = True
